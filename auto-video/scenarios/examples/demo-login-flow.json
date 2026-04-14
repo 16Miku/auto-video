@@ -1,0 +1,27 @@
+{
+  "scenarioId": "demo-login-flow",
+  "name": "Demo Login Flow",
+  "description": "Open a login page and demonstrate the login entry path.",
+  "target": {
+    "baseUrl": "https://example.com"
+  },
+  "steps": [
+    {
+      "stepId": "step-open-home",
+      "kind": "goto",
+      "goal": "打开首页",
+      "url": "https://example.com"
+    },
+    {
+      "stepId": "step-open-login",
+      "kind": "click",
+      "goal": "点击登录按钮",
+      "selector": "text=Login"
+    },
+    {
+      "stepId": "step-capture-login",
+      "kind": "screenshot",
+      "goal": "记录登录页面截图"
+    }
+  ]
+}
