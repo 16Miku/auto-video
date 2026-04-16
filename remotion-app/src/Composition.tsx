@@ -47,7 +47,6 @@ const pptShowcaseFastClip = clip(13 * 60 + 40, 13 * 60 + 45, 4);
 const pptShowcaseFinalClip = clip(13 * 60 + 58, 14 * 60 + 5, 1);
 const pdfUploadClip = clip(16 * 60 + 45, 17 * 60 + 47, 7.2);
 const pdfAnswerClip = clip(17 * 60 + 47, 18 * 60 + 52, 10.2);
-const ctaFrame = 30;
 
 const subtitleCues: SubtitleCue[] = [
   {
@@ -110,22 +109,9 @@ const FullscreenVideo: React.FC<ClipSpec> = ({ trimBeforeFrames, trimAfterFrames
   );
 };
 
-const FreezeFrameVideo: React.FC<{frame: number}> = ({ frame }) => {
-  // 使用 Video 播放单帧：trimBefore/trimAfter 相等表示播放该帧，playbackRate=0 冻结
-  const trimFrame = Math.round(frame / 30 * 30); // 对齐到帧
-  return (
-    <AbsoluteFill style={{ backgroundColor: "#050816" }}>
-      <Video
-        src={videoSrc}
-        muted
-        trimBefore={trimFrame}
-        trimAfter={trimFrame + 1}
-        playbackRate={0}
-        objectFit="cover"
-        style={{ width: "100%", height: "100%" }}
-      />
-    </AbsoluteFill>
-  );
+const FreezeFrameVideo: React.FC = () => {
+  // CTA 段使用纯色背景，视频背景对 6 秒 CTA 段价值有限
+  return <AbsoluteFill style={{ backgroundColor: "#050816" }} />;
 };
 
 const TextOverlay: React.FC<PromoSegmentProps> = ({ text, align = "left", darkOverlay = 0.14, placement = "bottom-left" }) => {
@@ -386,7 +372,7 @@ const SegmentExecution = () => {
 const SegmentCta = () => {
   return (
     <AbsoluteFill>
-      <FreezeFrameVideo frame={ctaFrame} />
+      <FreezeFrameVideo />
       <TextOverlay
         align="center"
         placement="center"
