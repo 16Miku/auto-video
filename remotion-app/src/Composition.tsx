@@ -395,14 +395,14 @@ export const UniClawWebsitePromo = () => {
   return (
     <AbsoluteFill style={{ backgroundColor: "#050816", fontFamily: "Inter, system-ui, sans-serif" }}>
       <Audio src={staticFile("uniclaw-voiceover-v1.mp3")} />
-      {/* BGM: 淡入 3s -> 配音密集段 0.06 -> 片尾 3s 淡出 */}
+      {/* BGM: 淡入 3s -> 配音密集段 0.12 -> 片尾 3s 淡出 */}
       <Audio
         src={staticFile("uniclaw-bgm-v1.mp3")}
         volume={(frame) => {
           const t = frame / 30;
-          if (t < 3) return (t / 3) * 0.12;
-          if (t > 63.2) return ((66.2 - t) / 3) * 0.12;
-          return 0.06;
+          if (t < 3) return (t / 3) * 0.4;
+          if (t > 63.2) return ((66.2 - t) / 3) * 0.4;
+          return 0.2;
         }}
       />
       <Sequence durationInFrames={150}>
