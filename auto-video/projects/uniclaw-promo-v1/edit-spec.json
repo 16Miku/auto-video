@@ -1,0 +1,315 @@
+{
+  "projectId": "uniclaw-promo-v1",
+  "version": "v1",
+  "compositionId": "UniClawWebsitePromoV1",
+  "fps": 30,
+  "durationInFrames": 1986,
+  "canvas": {
+    "width": 1920,
+    "height": 1080
+  },
+  "sourceVideo": {
+    "path": "A:/study/AI/LLM/browser-use-cli-test/UniClaw-Product.mp4",
+    "width": 1920,
+    "height": 1060,
+    "hasAudio": true,
+    "recommendedUsage": "visual-only"
+  },
+  "globalStyle": {
+    "tone": "professional",
+    "subtitleLanguage": "zh-CN",
+    "useDarkOverlay": true,
+    "overlayOpacity": 0.1,
+    "defaultTransition": "fade",
+    "bgmStyle": "light-tech"
+  },
+  "segments": [
+    {
+      "segmentId": "SegmentAIntro",
+      "title": "片头引入",
+      "timeline": {
+        "startFrame": 0,
+        "durationInFrames": 150
+      },
+      "sourceVideoRange": {
+        "sourceStartMs": 0,
+        "sourceEndMs": 5000,
+        "selectionStatus": "selected"
+      },
+      "video": {
+        "trimBeforeFrames": 0,
+        "trimAfterFrames": 150,
+        "playbackRate": 1,
+        "muted": true,
+        "fit": "cover"
+      },
+      "screenText": [
+        {
+          "kind": "headline",
+          "text": "UniClaw"
+        },
+        {
+          "kind": "subheadline",
+          "text": "让 AI 执行流程更清晰、更高效"
+        }
+      ],
+      "voiceoverText": "UniClaw，让 AI 以更高效、更可见的方式完成真实任务。",
+      "highlightRegions": [],
+      "motionPreset": "slow-push-in",
+      "transitionIn": "fade",
+      "transitionOut": "fade",
+      "overlays": [
+        "brand-title",
+        "dark-mask"
+      ]
+    },
+    {
+      "segmentId": "SegmentBValue",
+      "title": "核心价值概述",
+      "timeline": {
+        "startFrame": 150,
+        "durationInFrames": 270
+      },
+      "sourceVideoRange": {
+        "sourceStartMs": 1182000,
+        "sourceEndMs": 1227000,
+        "selectionStatus": "selected"
+      },
+      "video": {
+        "trimBeforeFrames": 35460,
+        "trimAfterFrames": 36810,
+        "playbackRate": 1,
+        "muted": true,
+        "fit": "cover"
+      },
+      "screenText": [
+        {
+          "kind": "callout",
+          "text": "统一入口承接任务"
+        },
+        {
+          "kind": "callout",
+          "text": "能力调用与执行过程可见"
+        }
+      ],
+      "voiceoverText": "它不是只用来聊天的 AI 界面，而是把任务理解、能力调用和执行过程组织在同一个工作流里。",
+      "highlightRegions": [
+        {
+          "label": "输入区",
+          "selectionStatus": "pending"
+        },
+        {
+          "label": "导航区",
+          "selectionStatus": "pending"
+        },
+        {
+          "label": "快捷能力区",
+          "selectionStatus": "pending"
+        }
+      ],
+      "motionPreset": "gentle-pan",
+      "transitionIn": "fade",
+      "transitionOut": "fade",
+      "overlays": [
+        "highlight-labels"
+      ]
+    },
+    {
+      "segmentId": "SegmentCChat",
+      "title": "聊天与统一入口展示",
+      "timeline": {
+        "startFrame": 420,
+        "durationInFrames": 420
+      },
+      "sourceVideoRange": {
+        "sourceStartMs": 5000,
+        "sourceEndMs": 27000,
+        "selectionStatus": "selected"
+      },
+      "video": {
+        "trimBeforeFrames": 150,
+        "trimAfterFrames": 810,
+        "playbackRate": 1.6,
+        "muted": true,
+        "fit": "cover"
+      },
+      "screenText": [
+        {
+          "kind": "callout",
+          "text": "从自然语言开始"
+        },
+        {
+          "kind": "callout",
+          "text": "快速进入可持续推进的任务会话"
+        }
+      ],
+      "voiceoverText": "用户可以直接从自然语言输入开始，快速发起任务，并在统一界面中持续获得响应与后续推进。",
+      "highlightRegions": [
+        {
+          "label": "输入发送动作",
+          "selectionStatus": "pending"
+        },
+        {
+          "label": "回答出现区域",
+          "selectionStatus": "pending"
+        }
+      ],
+      "motionPreset": "response-hold",
+      "transitionIn": "fade",
+      "transitionOut": "fade",
+      "overlays": [
+        "chat-callouts"
+      ],
+      "markers": [
+        "message-send",
+        "response-first-visible"
+      ]
+    },
+    {
+      "segmentId": "SegmentDModules",
+      "title": "能力模块与实例组织展示",
+      "timeline": {
+        "startFrame": 840,
+        "durationInFrames": 606
+      },
+      "sourceVideoRange": {
+        "sourceStartMs": 256000,
+        "sourceEndMs": 845000,
+        "selectionStatus": "selected"
+      },
+      "video": {
+        "trimBeforeFrames": 7680,
+        "trimAfterFrames": 25350,
+        "playbackRate": 18.0,
+        "muted": true,
+        "fit": "cover"
+      },
+      "screenText": [
+        {
+          "kind": "callout",
+          "text": "结构化能力，一目了然"
+        },
+        {
+          "kind": "callout",
+          "text": "实例化组织，让使用方式更可管理"
+        },
+        {
+          "kind": "callout",
+          "text": "真实业务反馈同样可见"
+        }
+      ],
+      "voiceoverText": "除了对话入口，UniClaw 还提供结构化能力模块和实例化组织方式，让复杂流程更容易管理，真实的业务反馈也能被直接呈现。",
+      "highlightRegions": [
+        {
+          "label": "PPT 任务发起",
+          "selectionStatus": "selected"
+        },
+        {
+          "label": "任务执行过程",
+          "selectionStatus": "selected"
+        },
+        {
+          "label": "PPT 结果展示",
+          "selectionStatus": "selected"
+        }
+      ],
+      "motionPreset": "multi-sequence-highlight",
+      "transitionIn": "fade",
+      "transitionOut": "fade",
+      "overlays": [
+        "module-callouts",
+        "limit-feedback-highlight"
+      ]
+    },
+    {
+      "segmentId": "SegmentEExecution",
+      "title": "执行过程与结果可见性展示",
+      "timeline": {
+        "startFrame": 1446,
+        "durationInFrames": 360
+      },
+      "sourceVideoRange": {
+        "sourceStartMs": 1005000,
+        "sourceEndMs": 1132000,
+        "selectionStatus": "selected"
+      },
+      "video": {
+        "trimBeforeFrames": 30150,
+        "trimAfterFrames": 33960,
+        "playbackRate": 10.2,
+        "muted": true,
+        "fit": "cover"
+      },
+      "screenText": [
+        {
+          "kind": "callout",
+          "text": "执行过程清晰可见"
+        },
+        {
+          "kind": "callout",
+          "text": "输入、步骤与结果统一呈现"
+        }
+      ],
+      "voiceoverText": "在执行过程中，任务输入、子步骤和结果反馈都可以被直观查看，帮助团队真正理解 AI 完成了什么。",
+      "highlightRegions": [
+        {
+          "label": "PDF 上传与提问",
+          "selectionStatus": "selected"
+        },
+        {
+          "label": "Agent 运行过程",
+          "selectionStatus": "selected"
+        },
+        {
+          "label": "结果输出区",
+          "selectionStatus": "pending"
+        }
+      ],
+      "motionPreset": "step-by-step-focus",
+      "transitionIn": "fade",
+      "transitionOut": "fade",
+      "overlays": [
+        "execution-overlay"
+      ]
+    },
+    {
+      "segmentId": "SegmentFCTA",
+      "title": "收尾总结与 CTA",
+      "timeline": {
+        "startFrame": 1806,
+        "durationInFrames": 180
+      },
+      "sourceVideoRange": {
+        "sourceStartMs": 1000,
+        "sourceEndMs": 1000,
+        "selectionStatus": "selected-fixed-frame"
+      },
+      "video": {
+        "trimBeforeFrames": 30,
+        "trimAfterFrames": 30,
+        "playbackRate": 0.95,
+        "muted": true,
+        "fit": "cover"
+      },
+      "screenText": [
+        {
+          "kind": "headline",
+          "text": "更高效、更可见的 AI 执行工作流"
+        },
+        {
+          "kind": "cta",
+          "text": "了解 UniClaw，开启更清晰的任务执行方式"
+        }
+      ],
+      "voiceoverText": "UniClaw，帮助团队构建更高效、更可见的 AI 执行工作流。",
+      "highlightRegions": [],
+      "motionPreset": "freeze-or-slow-push",
+      "transitionIn": "fade",
+      "transitionOut": "fade",
+      "overlays": [
+        "cta-panel",
+        "brand-outro"
+      ]
+    }
+  ]
+}

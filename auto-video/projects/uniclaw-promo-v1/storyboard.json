@@ -1,0 +1,178 @@
+{
+  "projectId": "uniclaw-promo-v1",
+  "version": "v1",
+  "inputVideo": "A:/study/AI/LLM/browser-use-cli-test/UniClaw-Product.mp4",
+  "targetPlatform": "website",
+  "style": "professional",
+  "durationMs": 60000,
+  "language": "zh-CN",
+  "segments": [
+    {
+      "segmentId": "SegmentAIntro",
+      "title": "片头引入",
+      "startMs": 0,
+      "endMs": 5000,
+      "goal": "快速建立品牌感和产品第一印象，说明 UniClaw 是围绕 AI 工作流和任务执行展开的产品。",
+      "suggestedVisuals": [
+        "选择界面整体最清晰、信息密度均衡的一帧或短片段作为背景",
+        "背景可做轻微暗化、轻微放大或慢速推近",
+        "叠加主标题与副标题"
+      ],
+      "screenText": [
+        "UniClaw",
+        "让 AI 执行流程更清晰、更高效"
+      ],
+      "voiceoverText": "UniClaw，让 AI 以更高效、更可见的方式完成真实任务。",
+      "editingNotes": [
+        "开头使用淡入",
+        "背景尽量稳定",
+        "标题使用淡入加轻微上移"
+      ],
+      "remotionNotes": [
+        "原视频作为背景层",
+        "叠加标题层与轻量遮罩层",
+        "可增加 8% 到 12% 的深色蒙版"
+      ]
+    },
+    {
+      "segmentId": "SegmentBValue",
+      "title": "核心价值概述",
+      "startMs": 5000,
+      "endMs": 14000,
+      "goal": "快速说明产品价值，突出 UniClaw 是组织任务执行的统一工作台。",
+      "suggestedVisuals": [
+        "首页主界面",
+        "左侧导航区",
+        "中央输入区",
+        "快捷能力入口"
+      ],
+      "screenText": [
+        "统一入口承接任务",
+        "能力调用与执行过程可见"
+      ],
+      "voiceoverText": "它不是只用来聊天的 AI 界面，而是把任务理解、能力调用和执行过程组织在同一个工作流里。",
+      "editingNotes": [
+        "选取首页稳定展示段",
+        "在关键区域之间做轻微推镜或局部高亮",
+        "每个屏幕文案至少停留 1.5 秒"
+      ],
+      "remotionNotes": [
+        "用 highlight 或 callout 依次标出输入区、导航区和快捷能力区",
+        "保持较少切镜"
+      ]
+    },
+    {
+      "segmentId": "SegmentCChat",
+      "title": "聊天与统一入口展示",
+      "startMs": 14000,
+      "endMs": 28000,
+      "goal": "展示从自然语言输入开始使用 UniClaw，并快速得到响应。",
+      "suggestedVisuals": [
+        "主输入框输入测试问题",
+        "发送消息",
+        "AI 返回回答",
+        "会话态形成"
+      ],
+      "screenText": [
+        "从自然语言开始",
+        "快速进入可持续推进的任务会话"
+      ],
+      "voiceoverText": "用户可以直接从自然语言输入开始，快速发起任务，并在统一界面中持续获得响应与后续推进。",
+      "editingNotes": [
+        "保留输入到回复出现的完整因果链",
+        "压缩等待回复的空白时间",
+        "回复出现时略微减速或短暂停留"
+      ],
+      "remotionNotes": [
+        "支持 trim 去掉多余等待",
+        "在发送动作点和回答出现点打 marker",
+        "字幕紧跟旁白"
+      ]
+    },
+    {
+      "segmentId": "SegmentDModules",
+      "title": "能力模块与实例组织展示",
+      "startMs": 28000,
+      "endMs": 42000,
+      "goal": "展示结构化能力模块和实例化组织方式，体现平台化与可管理性。",
+      "suggestedVisuals": [
+        "Skills 页面",
+        "Claws 页面",
+        "新建实例流程",
+        "套餐上限反馈提示"
+      ],
+      "screenText": [
+        "结构化能力，一目了然",
+        "实例化组织，让使用方式更可管理",
+        "真实业务反馈同样可见"
+      ],
+      "voiceoverText": "除了对话入口，UniClaw 还提供结构化能力模块和实例化组织方式，让复杂流程更容易管理，真实的业务反馈也能被直接呈现。",
+      "editingNotes": [
+        "Skills 与 Claws 切换短促明确",
+        "新建实例流程只保留关键动作节点",
+        "套餐上限提示保留 1 到 2 秒"
+      ],
+      "remotionNotes": [
+        "适合做多段 Sequence 拼接",
+        "可对实例上限提示加局部高亮框",
+        "必要时对弹窗区域做局部放大"
+      ]
+    },
+    {
+      "segmentId": "SegmentEExecution",
+      "title": "执行过程与结果可见性展示",
+      "startMs": 42000,
+      "endMs": 54000,
+      "goal": "突出任务执行层面的差异化价值，展示执行痕迹、子任务和过程信息。",
+      "suggestedVisuals": [
+        "进入我的 Claw 工作区",
+        "输入测试任务",
+        "展示任务执行过程",
+        "展示子 Claw 或子任务痕迹",
+        "展示结果输出区"
+      ],
+      "screenText": [
+        "执行过程清晰可见",
+        "输入、步骤与结果统一呈现"
+      ],
+      "voiceoverText": "在执行过程中，任务输入、子步骤和结果反馈都可以被直观查看，帮助团队真正理解 AI 完成了什么。",
+      "editingNotes": [
+        "为差异化能力留出更完整识别时间",
+        "保留任务进入执行态的关键过渡",
+        "通过局部放大突出任务区、步骤区和结果区"
+      ],
+      "remotionNotes": [
+        "使用 2 到 3 段局部高亮",
+        "增加 Task -> Execute -> Output overlay",
+        "与关键词字幕高亮同步"
+      ]
+    },
+    {
+      "segmentId": "SegmentFCTA",
+      "title": "收尾总结与 CTA",
+      "startMs": 54000,
+      "endMs": 60000,
+      "goal": "完成价值收束，形成官网宣传视频的结束感和行动引导。",
+      "suggestedVisuals": [
+        "回到能代表产品整体感的主界面或执行结果界面",
+        "画面轻微减速或冻结",
+        "叠加品牌总结语和 CTA"
+      ],
+      "screenText": [
+        "更高效、更可见的 AI 执行工作流",
+        "了解 UniClaw，开启更清晰的任务执行方式"
+      ],
+      "voiceoverText": "UniClaw，帮助团队构建更高效、更可见的 AI 执行工作流。",
+      "editingNotes": [
+        "结尾使用轻微淡出",
+        "CTA 至少停留 1.5 秒",
+        "最后 1 秒可过渡到更干净的品牌结尾画面"
+      ],
+      "remotionNotes": [
+        "结尾段可使用 freeze frame 或慢速推近",
+        "文案层与片头风格统一",
+        "为多尺寸适配预留安全边距"
+      ]
+    }
+  ]
+}

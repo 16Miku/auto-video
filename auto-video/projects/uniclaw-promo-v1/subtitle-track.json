@@ -1,0 +1,48 @@
+{
+  "compositionId": "UniClawWebsitePromoV1",
+  "fps": 30,
+  "cues": [
+    {
+      "cueId": "subtitle-segment-a",
+      "segmentId": "SegmentAIntro",
+      "startFrame": 0,
+      "endFrame": 150,
+      "text": "UniClaw，让 AI 以更高效、更可见的方式完成真实任务。"
+    },
+    {
+      "cueId": "subtitle-segment-b",
+      "segmentId": "SegmentBValue",
+      "startFrame": 150,
+      "endFrame": 420,
+      "text": "它不是只用来聊天的 AI 界面，而是把任务理解、能力调用和执行过程组织在同一个工作流里。"
+    },
+    {
+      "cueId": "subtitle-segment-c",
+      "segmentId": "SegmentCChat",
+      "startFrame": 420,
+      "endFrame": 840,
+      "text": "用户可以直接从自然语言输入开始，快速发起任务，并在统一界面中持续获得响应与后续推进。"
+    },
+    {
+      "cueId": "subtitle-segment-d",
+      "segmentId": "SegmentDModules",
+      "startFrame": 840,
+      "endFrame": 1446,
+      "text": "除了对话入口，UniClaw 还提供结构化能力模块和实例化组织方式，让复杂流程更容易管理，真实的业务反馈也能被直接呈现。"
+    },
+    {
+      "cueId": "subtitle-segment-e",
+      "segmentId": "SegmentEExecution",
+      "startFrame": 1446,
+      "endFrame": 1806,
+      "text": "在执行过程中，任务输入、子步骤和结果反馈都可以被直观查看，帮助团队真正理解 AI 完成了什么。"
+    },
+    {
+      "cueId": "subtitle-segment-f",
+      "segmentId": "SegmentFCTA",
+      "startFrame": 1806,
+      "endFrame": 1986,
+      "text": "UniClaw，帮助团队构建更高效、更可见的 AI 执行工作流。"
+    }
+  ]
+}
