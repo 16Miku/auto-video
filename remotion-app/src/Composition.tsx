@@ -1,4 +1,4 @@
-import { AbsoluteFill, Audio, Easing, Img, interpolate, Sequence, spring, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
+import { AbsoluteFill, Audio, Easing, interpolate, Sequence, spring, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
 import { Video } from "@remotion/media";
 
 type SegmentText = {
@@ -111,9 +111,19 @@ const FullscreenVideo: React.FC<ClipSpec> = ({ trimBeforeFrames, trimAfterFrames
 };
 
 const FreezeFrameVideo: React.FC<{frame: number}> = ({ frame }) => {
+  // 使用 Video 播放单帧：trimBefore/trimAfter 相等表示播放该帧，playbackRate=0 冻结
+  const trimFrame = Math.round(frame / 30 * 30); // 对齐到帧
   return (
     <AbsoluteFill style={{ backgroundColor: "#050816" }}>
-      <Img src={`${videoSrc}#t=${(frame / 30).toFixed(3)}`} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+      <Video
+        src={videoSrc}
+        muted
+        trimBefore={trimFrame}
+        trimAfter={trimFrame + 1}
+        playbackRate={0}
+        objectFit="cover"
+        style={{ width: "100%", height: "100%" }}
+      />
     </AbsoluteFill>
   );
 };
