@@ -463,6 +463,73 @@ D4b 的目标是完整展示 `13:58-14:05`，用户希望原本约 8 秒的内�
 - [ ] 是否接入 BGM
 - [x] 是否把 `storyboard.json`、`edit-spec.json`、代码实现同步到同一版本
 
+### 8.6 字幕轨实现要点
+
+字幕轨是"静音可读"的关键保障。本次实现经验如下：
+
+#### 数据层：subtitle-track.json
+
+字幕文件按 Segment 组织为 cue 数组，每个 cue 包含：
+
+```json
+{
+  "cueId": "subtitle-segment-a",
+  "segmentId": "SegmentAIntro",
+  "startFrame": 0,
+  "endFrame": 150,
+  "text": "UniClaw，让 AI 以更高效、更可见的方式完成真实任务。"
+}
+```
+
+`startFrame` 和 `endFrame` 与 Remotion 中的 Sequence 时间线严格对应，后续无论怎么调整 Segment 时长，都以这个文件为准。
+
+#### 渲染层：SubtitleTrack 组件
+
+```tsx
+const SubtitleTrack: React.FC = () => {
+  const frame = useCurrentFrame();
+  const activeCue = subtitleCues.find(
+    (cue) => frame >= cue.startFrame && frame < cue.endFrame
+  );
+  if (!activeCue) return null;
+
+  return (
+    <AbsoluteFill style={{ pointerEvents: "none" }}>
+      <div style={{
+        position: "absolute", left: 140, right: 140, bottom: 42,
+        display: "flex", justifyContent: "center",
+      }}>
+        <div style={{
+          maxWidth: 1080, padding: "16px 24px", borderRadius: 22,
+          background: "rgba(5, 8, 22, 0.72)", color: "white",
+          fontSize: 28, lineHeight: 1.45, fontWeight: 600,
+          textAlign: "center",
+          boxShadow: "0 16px 42px rgba(0, 0, 0, 0.24)",
+          backdropFilter: "blur(10px)",
+        }}>
+          {activeCue.text}
+        </div>
+      </div>
+    </AbsoluteFill>
+  );
+};
+```
+
+#### 两个关键实现细节
+
+1. **`pointerEvents: "none"` 必须放在 `style` 里**，不能作为 `AbsoluteFill` 的 props 传递，否则 TypeScript 报错 `Property 'pointerEvents' does not exist`。
+
+2. **字幕 cue 的时间区间用左闭右开 `[startFrame, endFrame)`**，查找时 `frame >= startFrame && frame < endFrame`，避免相邻 cue 在边界帧都匹配的问题。
+
+#### 为什么用整句级而非逐词高亮
+
+当前字幕是 Segment 级别的整句字幕，理由是：
+- 实现最简单，调试成本最低；
+- 配音和字幕同步的最小粒度就是整句；
+- 逐词高亮需要配音时间轴对齐，增加复杂度和维护成本。
+
+后续如需逐词高亮，可基于 `voiceover-script.json` 的每句时长在 Remotion 中做更细粒度的拆分。
+
 ## 9. 当前遗留问题与下一阶段待办
 
 虽然当前时间线已经稳定，但项目仍有明显未完成项。
