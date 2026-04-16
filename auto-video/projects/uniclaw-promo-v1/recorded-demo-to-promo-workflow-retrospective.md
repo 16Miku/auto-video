@@ -457,11 +457,11 @@ D4b 的目标是完整展示 `13:58-14:05`，用户希望原本约 8 秒的内�
 
 ### 8.5 包装与完成层
 
-- [ ] 是否优化文字遮挡
-- [ ] 是否补齐字幕轨
-- [ ] 是否接入中文配音
+- [x] 是否优化文字遮挡（顶部栏单列居中布局）
+- [x] 是否补齐字幕轨（6 段整句级字幕）
+- [x] 是否接入中文配音（edge-tts XiaoxiaoNeural）
 - [ ] 是否接入 BGM
-- [ ] 是否把 `storyboard.json`、`edit-spec.json`、代码实现同步到同一版本
+- [x] 是否把 `storyboard.json`、`edit-spec.json`、代码实现同步到同一版本
 
 ## 9. 当前遗留问题与下一阶段待办
 
@@ -473,19 +473,21 @@ D4b 的目标是完整展示 `13:58-14:05`，用户希望原本约 8 秒的内�
    - 早期用户已经指出当前大标题和正文对产品界面遮挡偏明显；
    - 目前为了优先收敛切片与节奏，尚未专门优化文字布局、安全区、字号和蒙版强度。
 
-2. **字幕尚未接入**
-   - 当前只有文案稿和旁白草稿；
-   - Remotion 里还没有正式字幕轨。
+2. **字幕轨已接入** ✅
+   - 整句级字幕轨已接入，6 个 Segment 全部有对应字幕 cue；
+   - 字幕显示在底部居中，带半透明背景和圆角。
 
-3. **中文配音尚未接入**
-   - 当前只有脚本，没有生成配音音频并挂到时间线中。
+3. **中文配音已接入** ✅
+   - 使用 edge-tts（XiaoxiaoNeural）生成第一版中文配音；
+   - 配音文件：`remotion-app/public/uniclaw-voiceover-v1.mp3`；
+   - 通过 `<Audio src={staticFile("uniclaw-voiceover-v1.mp3")} />` 在 Composition 顶层接入；
+   - 配音时长约 66 秒，与视频总时长基本对齐。
 
 4. **BGM 尚未接入**
    - 成片还没有背景音乐层，整体情绪和品牌感仍比较弱。
 
-5. **结构化产物存在同步差**
-   - `edit-spec.json` 已比较接近当前实现；
-   - `storyboard.json` 还停留在较早版本，需要同步更新时间线与片段设计。
+5. **结构化产物已同步** ✅
+   - `edit-spec.json`、`storyboard.json`、`subtitle-track.json`、`voiceover-script.json` 均已更新到最新版本并提交。
 
 ### 9.2 推荐下一步顺序
 
@@ -495,23 +497,150 @@ D4b 的目标是完整展示 `13:58-14:05`，用户希望原本约 8 秒的内�
    - 先把标题、正文、蒙版、安全区布局调顺；
    - 这是当前最容易在预览中直接看到提升的一项。
 
-2. **补字幕轨**
-   - 先做整句级字幕，不急着做逐词高亮；
-   - 目标是保证观众静音观看时也能理解内容。
+2. **补 BGM**
+   - 在配音稳定后加入轻科技感背景音乐；
+   - 需要做音量 ducking，让配音清晰、BGM 作为氛围底层。
 
-3. **补中文配音**
-   - 基于当前旁白稿生成第一版配音；
-   - 再根据真实时间线调整句长、停顿和落点。
+3. **优化配音与时间线匹配**
+   - 检查每段配音是否在对应 Segment 时间内说完；
+   - 如有句子过长或过短，通过微调语速（`rate` 参数）修正；
+   - 极端情况才修改 Segment 时长。
 
-4. **补 BGM**
-   - 在配音和字幕基本稳定后加入轻科技感背景音乐；
-   - 再根据片段节奏做音量包络与淡入淡出。
+4. **字幕精细化（可选）**
+   - 如果需要逐词高亮型字幕，再基于配音做音素级时间对齐。
 
 5. **同步结构化产物**
    - 把 `storyboard.json` 同步到最新版；
    - 如有需要，再补 `voiceover-script.json`、`subtitle-track.json`。
 
-## 10. 对后续自动化能力的启发
+## 10. 中文配音接入：edge-tts 实践
+
+### 10.1 整体流程
+
+本次接入中文配音采用 edge-tts 路线，完整流程如下：
+
+```
+voiceover-script.json（结构化旁白文本）
+    → edge-tts 生成各段 MP3
+    → ffmpeg 合并为单条音轨
+    → 放入 remotion-app/public/
+    → <Audio src={staticFile("uniclaw-voiceover-v1.mp3")} /> 接入 Composition
+```
+
+### 10.2 voiceover-script.json
+
+结构化旁白脚本文件，核心字段：
+
+```json
+{
+  "compositionId": "UniClawWebsitePromoV1",
+  "language": "zh-CN",
+  "ttsEngine": "edge-tts",
+  "voice": "zh-CN-XiaoxiaoNeural",
+  "segments": [
+    {
+      "segmentId": "SegmentAIntro",
+      "startFrame": 0,
+      "endFrame": 150,
+      "durationFrames": 150,
+      "text": "UniClaw，让 AI 以更高效、更可见的方式完成真实任务。"
+    }
+  ]
+}
+```
+
+这个文件是配音文本的单一数据源，后续无论用 edge-tts 还是 ElevenLabs 或人工录音，都复用同一份契约。
+
+### 10.3 edge-tts 中文语音选项
+
+edge-tts 内置多个中文 voice，推荐按场景选用：
+
+| Voice | 特点 | 适用场景 |
+|---|---|---|
+| `zh-CN-XiaoxiaoNeural` | 专业女声，清晰流畅 | 产品介绍、官网宣传片（本次选用） |
+| `zh-CN-YunxiNeural` | 年轻男声，有点活泼 | 科技产品演示、年轻化品牌 |
+| `zh-CN-YunjianNeural` | 阳刚男声 | 强技术感、专业工具类 |
+| `zh-CN-XiaoyiNeural` | 温柔女声 | 情感类、教育类内容 |
+| `zh-CN-YunyangNeural` | 新闻播报风格 | 资讯类内容 |
+
+常用参数：
+- `rate`：语速，如 `"+10%"` 加快，`"-10%"` 减慢
+- `pitch`：音高，如 `"+5Hz"` 略升高
+
+### 10.4 ffmpeg 路径经验
+
+在 Windows 环境下，ffmpeg 不一定已全局安装。本次发现 Remotion 依赖包中自带 ffmpeg：
+
+```
+remotion-app/node_modules/@remotion/compositor-win32-x64-msvc/ffmpeg.exe
+```
+
+可用于音频合并等操作，无需额外安装。Linux/macOS 下 Remotion 也有对应版本。
+
+### 10.5 配音生成的 Python 脚本
+
+参考 `generate_voiceover.py`，核心逻辑：
+
+```python
+from edge_tts import Communicate
+
+async def generate_segment(text: str, output_path: str):
+    voice = "zh-CN-XiaoxiaoNeural"
+    communicate = Communicate(text, voice, rate="+0%", pitch="+0Hz")
+    await communicate.save(output_path)
+
+# 合并所有段
+subprocess.run([
+    FFMPEG, "-y",
+    "-f", "concat", "-safe", "0",
+    "-i", concat_list,  # 每行 "file 'xxx.mp3'"
+    "-acodec", "libmp3lame", "-q:a", "2",
+    "uniclaw-voiceover-v1.mp3"
+])
+```
+
+### 10.6 Remotion Audio 层接入
+
+在 `Composition.tsx` 的根 composition 中加入：
+
+```tsx
+import { Audio, staticFile } from "remotion";
+
+export const UniClawWebsitePromo = () => {
+  return (
+    <AbsoluteFill style={{ backgroundColor: "#050816" }}>
+      {/* 顶层统一音频层 */}
+      <Audio src={staticFile("uniclaw-voiceover-v1.mp3")} />
+      <Sequence durationInFrames={150}><SegmentIntro /></Sequence>
+      {/* ... 其他 Segments */}
+    </AbsoluteFill>
+  );
+};
+```
+
+当前采用统一单条音轨方式（不分段），原因是字幕和文案都是整句级，简化实现复杂度。
+
+### 10.7 配音与时间线匹配策略
+
+edge-tts 按自然语速生成，实际时长不一定精确对齐目标帧数。推荐处理策略：
+
+1. **先按目标时长生成首版**：每段配音应该说的内容对应目标帧数，如 150 帧 ≈ 5 秒
+2. **检查实际生成时长**：如某段配音明显短于/长于目标时间
+3. **微调顺序**：先调文字内容长度 → 次调语速（rate） → 最后才改 Segment 时长
+4. **不要频繁修改 Segment 时长**：因为它会影响所有子片段的时间基准
+
+### 10.8 playbackRate 对音频的影响
+
+在 Remotion 中使用 `playbackRate` 对视频片段做倍速播放时：
+- 视频和音频都会同步变速
+- 高倍速（如 30x）会给浏览器解码带来很大压力
+- **建议对高倍速片段同时设置为 `muted: true`**，只保留配音音轨，避免同时处理两套音频
+
+D 段经验值参考：
+- 10x 以内：音频仍可接受，muted 视频可保证画面流畅
+- 20x 以上：强烈建议 `muted: true`，否则 Studio 预览会卡顿
+
+## 11. 对后续自动化能力的启发
 
 这次实践不仅是在做一条视频，也在暴露后续值得自动化的环节。
 
@@ -549,17 +678,20 @@ D4b 的目标是完整展示 `13:58-14:05`，用户希望原本约 8 秒的内�
 3. **最终审美判断**
    - 文案是否遮挡、节奏是否舒适、结果展示是否足够清楚，最终仍需人工预览确认。
 
-## 11. 小结
+## 12. 小结
 
 这次实践已经验证了如下结论：
 
 1. **已有录屏完全可以作为官网宣传片的原始输入素材；**
 2. **结构化中间产物能够有效连接策划与实现；**
-3. **Remotion 非常适合承担“真实切片 + 时间线重组 + 文案叠加”的角色；**
+3. **Remotion 非常适合承担”真实切片 + 时间线重组 + 文案叠加”的角色；**
 4. **用户人工识别母视频时间点，是当前阶段非常高效的真实切片前置步骤；**
 5. **长任务演示不应只靠整体快进，更适合拆成多个叙事节点分别处理；**
-6. **父级 Sequence 时长必须和内部片段总时长一起设计，否则会出现“内部已改长、外层仍截断”的典型问题；**
-7. **在切片与节奏收敛之前，不应过早投入字幕、配音、BGM 等包装层。**
+6. **父级 Sequence 时长必须和内部片段总时长一起设计，否则会出现”内部已改长、外层仍截断”的典型问题；**
+7. **在切片与节奏收敛之前，不应过早投入字幕、配音、BGM 等包装层；**
+8. **edge-tts 是快速生成中文配音的有效工具，XiaoxiaoNeural 适合产品介绍类视频；**
+9. **Remotion 捆绑的 ffmpeg 可直接用于音频合并等操作，无需额外安装；**
+10. **高倍速视频片段应设为 muted，只保留配音音轨，避免浏览器解码压力导致卡顿。**
 
 到当前为止，这条从“已有录屏”到“可预览官网宣传片”的最小可运行工作流已经跑通。
 
