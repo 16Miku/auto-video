@@ -814,11 +814,221 @@ python process_bgm.py \
 
 **最终出片阶段**：Studio 预览满意后，再用 FFmpeg 出单一混合音频，渲染速度更快、音质更稳定。
 
-## 12. 对后续自动化能力的启发
+## 12. Remotion 实现模式总结
+
+本节总结本次实践中实际用到的 Remotion 核心模式，可作为后续同类项目的参考模板。
+
+### 12.1 项目结构约定
+
+```
+remotion-app/
+├── public/               ← 所有源素材放这里（视频、音频、图片）
+│   ├── UniClaw-Product.mp4
+│   ├── uniclaw-voiceover-v1.mp3
+│   └── uniclaw-bgm-v1.mp3
+├── src/
+│   ├── Composition.tsx   ← 主 composition（含所有 Segment 组件）
+│   └── Root.tsx         ← composition 注册（durationInFrames、fps、dimensions）
+└── package.json
+```
+
+**关键原则**：
+- 源素材必须放 `public/`，不能放 `src/` 或其他目录
+- 代码中通过 `staticFile("文件名")` 引用，`public/` 会被 Remotion 打包识别
+
+### 12.2 素材引用：`staticFile()`
+
+```tsx
+import { staticFile } from "remotion";
+import { Audio } from "@remotion/media";
+
+// 视频/音频/图片统一用 staticFile
+const videoSrc = staticFile("UniClaw-Product.mp4");
+<Audio src={staticFile("uniclaw-voiceover-v1.mp3")} />
+```
+
+`staticFile()` 会返回正确编码的 URL，支持部署到子目录时路径仍有效。文件名中的特殊字符（`#`、`?`、`&`）会自动编码。
+
+### 12.3 视频切片工具函数：`clip()`
+
+封装 `trimBefore` / `trimAfter` / `playbackRate` 为一个语义清晰的函数：
+
+```tsx
+type ClipSpec = {
+  trimBeforeFrames: number;
+  trimAfterFrames: number;
+  playbackRate: number;
+};
+
+const clip = (
+  startSeconds: number,
+  endSeconds: number,
+  playbackRate = 1
+): ClipSpec => ({
+  trimBeforeFrames: Math.round(startSeconds * 30),
+  trimAfterFrames: Math.round(endSeconds * 30),
+  playbackRate,
+});
+
+// 使用示例
+const pptRunClip = clip(5 * 60 + 23, 13 * 60 + 1, 30); // 5:23-13:01, 30x速
+
+// 在 FullscreenVideo 中使用
+<Video
+  src={videoSrc}
+  muted
+  trimBefore={trimBeforeFrames}
+  trimAfter={trimAfterFrames}
+  playbackRate={playbackRate}
+  style={{ width: "100%", height: "100%", objectFit: "cover" }}
+/>
+```
+
+### 12.4 时间驱动：`useCurrentFrame()` + `useVideoConfig()`
+
+所有动态逻辑（字幕激活判断、文字入场动画、BGM 音量回调）都基于这两个 Hook：
+
+```tsx
+const frame = useCurrentFrame();      // 当前帧号（从 0 开始）
+const { fps } = useVideoConfig();    // 获取 fps（30）
+const seconds = frame / fps;          // 转为秒
+
+// 字幕激活判断
+const activeCue = subtitleCues.find(
+  (cue) => frame >= cue.startFrame && frame < cue.endFrame  // 左闭右开
+);
+
+// BGM 动态音量
+<Audio src={staticFile("bgm.mp3")} volume={(f) => {
+  const t = f / fps;
+  if (t < 3) return (t / 3) * 0.4;  // 淡入
+  if (t > 63.2) return ((66.2 - t) / 3) * 0.4;  // 淡出
+  return 0.2;
+}} />
+```
+
+### 12.5 文字入场动画：`spring()` + `interpolate()`
+
+```tsx
+import { spring, interpolate } from "remotion";
+
+const entrance = spring({
+  frame,           // 当前帧
+ fps,             // 帧率
+  config: { damping: 200, stiffness: 200 },  // 阻尼/刚度
+});
+
+const opacity = interpolate(frame, [0, 10], [0, 1], {
+  extrapolateRight: "clamp",
+});
+const translateY = interpolate(entrance, [0, 1], [24, 0]);
+```
+
+`spring()` 用于有物理感的弹性入场，`interpolate()` 用于线性过渡（透明度、位移等）。
+
+### 12.6 Sequence 嵌套与时长管理
+
+```tsx
+export const UniClawWebsitePromo = () => {
+  return (
+    <AbsoluteFill>
+      {/* 顶层：按帧位置排列各 Segment */}
+      <Sequence durationInFrames={150}>      <SegmentIntro />      </Sequence>
+      <Sequence from={150} durationInFrames={270}>  <SegmentValue />  </Sequence>
+      <Sequence from={420} durationInFrames={420}> <SegmentChat />   </Sequence>
+      <Sequence from={840} durationInFrames={606}>  <SegmentModules /> </Sequence>
+      <Sequence from={1446} durationInFrames={360}> <SegmentExecution /> </Sequence>
+      <Sequence from={1806} durationInFrames={180}> <SegmentCta />     </Sequence>
+      {/* 全局层：字幕和音频在最顶层 */}
+      <SubtitleTrack />
+    </AbsoluteFill>
+  );
+};
+```
+
+**重要原则**：父级 Sequence 的 `durationInFrames` 必须足够容纳所有子片段的总时长，否则子片段会被截断。本次 D4b 截断问题就是因此产生。
+
+### 12.7 TypeScript 类型限制（踩坑清单）
+
+| 错误写法 | 正确写法 | 原因 |
+|---------|---------|------|
+| `<AbsoluteFill pointerEvents="none">` | `<AbsoluteFill style={{ pointerEvents: "none" }}>` | `pointerEvents` 不是 AbsoluteFill 的 prop |
+| `<Video style={{ objectFit: "cover" }}>` | `<Video objectFit="cover">` | `objectFit` 应作为 prop，而非 style |
+| `playbackRate={0}` | 不支持，改为纯色背景 | Remotion 要求 playbackRate > 0 |
+| `import ... from "subtitle-track.json"` | 内联为 TypeScript 常量数组 | tsconfig 缺少 `resolveJsonModule` |
+
+### 12.8 多层 Audio 混合
+
+配音和 BGM 各为独立音轨，由 Remotion 实时混合：
+
+```tsx
+{/* 配音：固定音量 */}
+<Audio src={staticFile("uniclaw-voiceover-v1.mp3")} />
+
+{/* BGM：动态音量 */}
+<Audio
+  src={staticFile("uniclaw-bgm-v1.mp3")}
+  volume={(frame) => getDynamicVolume(frame, fps)}
+/>
+```
+
+调试阶段用独立音轨更灵活；最终出片时可用 FFmpeg `amix` 预混合为单条音轨，提升渲染性能。
+
+### 12.9 字幕 cue 的帧区间设计
+
+字幕 cue 数据结构采用**左闭右开**区间：
+
+```tsx
+const activeCue = subtitleCues.find(
+  (cue) => frame >= cue.startFrame && frame < cue.endFrame
+);
+```
+
+这样设计是为了避免相邻 cue 在边界帧同时匹配。每条 cue 包含：
+
+```tsx
+type SubtitleCue = {
+  cueId: string;
+  segmentId: string;
+  startFrame: number;
+  endFrame: number;
+  text: string;
+};
+```
+
+### 12.10 Remotion 最佳实践规则中值得下次尝试的模式
+
+以下 remotion-best-practices 中的能力本次未使用，但适合在更复杂的视频中引入：
+
+**1. `TransitionSeries` / 过渡系统**（`@remotion/transitions`）
+- 在 Segment 切换时添加 fade / slide / wipe 过渡效果
+- 过渡会重叠相邻场景，实际总时长比各段相加更短
+
+**2. `premountFor` 预加载优化**
+```tsx
+<Sequence premountFor={1 * fps}>
+  <HeavyComponent />
+</Sequence>
+```
+在 Sequence 实际播放前提前加载，避免首次出现时卡顿。
+
+**3. `calculateMetadata` 动态时长**
+- 从视频文件动态读取实际时长，替代手动指定 `durationInFrames`
+- 适合素材时长不确定的场景
+
+**4. `toneFrequency` 音高调整**
+- 在不改变速度的情况下调整音高，适合配音需要微调音调时使用
+- 仅在服务端渲染时生效
+
+**5. FFmpeg 音频操作**
+- `loudnorm` 音量标准化（本次用 `process_bgm.py` 的雏形）
+- `silencedetect` 自动检测静音段，用于自动剪辑
+
+## 13. 对后续自动化能力的启发
 
 这次实践不仅是在做一条视频，也在暴露后续值得自动化的环节。
 
-### 12.1 可以自动化的部分
+### 13.1 可以自动化的部分
 
 1. **母视频分析**
    - 自动抽帧；
@@ -840,7 +1050,7 @@ python process_bgm.py \
    - 自动估算句长与时间线匹配；
    - 自动挂接配音音频文件。
 
-### 12.2 暂时不适合完全自动化的部分
+### 13.2 暂时不适合完全自动化的部分
 
 1. **价值判断**
    - 哪个画面更能体现产品价值，仍需要用户或策划判断；
@@ -852,11 +1062,11 @@ python process_bgm.py \
 3. **最终审美判断**
    - 文案是否遮挡、节奏是否舒适、结果展示是否足够清楚，最终仍需人工预览确认。
 
-## 13. 渲染出片与关键技术问题
+## 14. 渲染出片与关键技术问题
 
 本次渲染阶段发现并解决了多个之前未暴露的技术问题。
 
-### 13.1 配音时长必须与视频帧对齐
+### 14.1 配音时长必须与视频帧对齐
 
 **问题**：第一版配音由 6 段 MP3 直接合并生成，总时长仅 51.72 秒，而视频需要 66.2 秒。E 段后半和 F 段全程没有配音，字幕和配音完全错位。
 
@@ -866,7 +1076,7 @@ python process_bgm.py \
 
 **经验**：配音脚本必须在每段后加入静音填充，不能假设各段配音时长等于目标帧时长。
 
-### 13.2 FreezeFrameVideo 的渲染兼容性问题
+### 14.2 FreezeFrameVideo 的渲染兼容性问题
 
 **问题 1 - `#t=` 帧引用在 CLI 渲染时不可用**：`Img src="video.mp4#t=1.0"` 这种引用依赖 HTTP 服务器，CLI 渲染时失败。
 
@@ -876,7 +1086,7 @@ python process_bgm.py \
 
 **经验**：在 Remotion 中实现"冻结帧"效果，不要用 `#t=` 或 `playbackRate=0`，直接用纯色背景或预渲染图片更可靠。
 
-### 13.3 渲染帧范围约定
+### 14.3 渲染帧范围约定
 
 **问题**：执行 `remotion render --frames=0-1986` 报错：`frame range 0-1986 is not inbetween 0-1985`。
 
@@ -884,7 +1094,7 @@ python process_bgm.py \
 
 **正确写法**：`--frames=0-1985` 或 `--frames=0-1986`（后者会自动处理）。
 
-### 13.4 Remotion 渲染的磁盘空间要求
+### 14.4 Remotion 渲染的磁盘空间要求
 
 **问题**：C 盘只剩 104MB，渲染时报 `ENOSPC: no space left on device`。
 
@@ -895,7 +1105,7 @@ python process_bgm.py \
 
 **经验**：渲染前确保 C 盘至少有 **5-10GB** 可用空间。临时文件目录为 `%TEMP%`，其中的 `remotion-webpack-bundle-*` 可在渲染前手动清理。
 
-### 13.5 Studio 预览不等于最终渲染结果
+### 14.5 Studio 预览不等于最终渲染结果
 
 **现象**：Studio 预览时 D 段 30x 快进明显卡顿，但最终渲染出片后画面流畅。
 
@@ -903,7 +1113,7 @@ python process_bgm.py \
 
 **经验**：Studio 预览只做"节奏和布局是否正确"的判断，不要用 Studio 预览来评估最终画面质量。最终质量必须以渲染出片为准。
 
-## 14. 小结
+## 15. 小结
 
 这次实践已经验证了如下结论：
 
